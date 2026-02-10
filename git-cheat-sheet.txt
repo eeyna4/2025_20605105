@@ -11,3 +11,4 @@ git checkout -b devel
 git checkout master
 git merge devel
 git reset --hard <commit>
+git diff master..devel
