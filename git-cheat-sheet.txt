@@ -1,0 +1,12 @@
+Git cheat sheet (WS2)
+
+git init
+git status
+git add .
+git commit -m "message"
+git log --oneline --decorate --graph --all
+git branch -v
+git checkout -b devel
+git checkout master
+git merge devel
+git reset --hard <commit>
