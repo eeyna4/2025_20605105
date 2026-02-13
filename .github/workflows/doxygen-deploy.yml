@@ -3,6 +3,7 @@ name: Deploy Doxygen docs
 on:
   push:
     branches: [ "master" ]
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -16,27 +17,18 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Install doxygen
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y doxygen graphviz
+        run: sudo apt-get update && sudo apt-get install -y doxygen graphviz
 
-      - name: Show repo tree
+      - name: Generate docs into docs/
         run: |
-          pwd
-          ls -la
-          find . -maxdepth 2 -type d -print
-
-      - name: Generate docs
-        run: |
-          cd Worksheet5
           doxygen Doxyfile
-          ls -la
-          ls -la html
+          ls -la docs
+          ls -la docs/html
 
       - name: Deploy to gh-pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_branch: gh-pages
-          publish_dir: Worksheet5/html
+          publish_dir: docs/html
           force_orphan: true
