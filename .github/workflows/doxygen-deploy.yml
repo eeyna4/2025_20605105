@@ -11,7 +11,6 @@ permissions:
 jobs:
   doxygen:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -19,16 +18,15 @@ jobs:
       - name: Install doxygen
         run: sudo apt-get update && sudo apt-get install -y doxygen graphviz
 
-      - name: Generate docs into docs/
+      - name: Generate docs
         run: |
+          cd Worksheet5
           doxygen Doxyfile
-          ls -la docs
-          ls -la docs/html
 
       - name: Deploy to gh-pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_branch: gh-pages
-          publish_dir: docs/html
+          publish_dir: Worksheet5/html
           force_orphan: true
