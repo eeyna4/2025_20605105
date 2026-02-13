@@ -18,6 +18,7 @@ cmake-build-*/
 .DS_Store
 Thumbs.db
 
+# Binaries
 *.exe
 *.lib
 *.dll
@@ -28,10 +29,7 @@ Worksheet3/**/release_static/
 Worksheet3/**/release_dynamic/
 Worksheet3/**/*_Static.zip
 Worksheet3/**/*_Dynamic.zip
-Worksheet5/html/
-Worksheet5/html/
-Worksheet5/latex/
 
-# Doxygen output
+# Doxygen output (Worksheet5)
 Worksheet5/html/
 Worksheet5/latex/
