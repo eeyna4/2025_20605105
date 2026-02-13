@@ -10,22 +10,26 @@ permissions:
 jobs:
   doxygen:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repo
+        uses: actions/checkout@v4
 
       - name: Install doxygen
-        run: sudo apt-get update && sudo apt-get install -y doxygen graphviz
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y doxygen graphviz
 
       - name: Show repo tree
         run: |
           pwd
           ls -la
-          ls -la
+          find . -maxdepth 2 -type d -print
 
       - name: Generate docs
         run: |
           cd Worksheet5
-          doxygen
+          doxygen Doxyfile
           ls -la
           ls -la html
 
