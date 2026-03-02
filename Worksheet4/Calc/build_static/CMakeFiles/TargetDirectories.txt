@@ -1,0 +1,4 @@
+C:/Users/LLR User/2025_20605105/Worksheet4/Calc/build_static/CMakeFiles/maths.dir
+C:/Users/LLR User/2025_20605105/Worksheet4/Calc/build_static/CMakeFiles/calc.dir
+C:/Users/LLR User/2025_20605105/Worksheet4/Calc/build_static/CMakeFiles/edit_cache.dir
+C:/Users/LLR User/2025_20605105/Worksheet4/Calc/build_static/CMakeFiles/rebuild_cache.dir

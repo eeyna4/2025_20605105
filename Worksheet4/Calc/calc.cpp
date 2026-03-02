@@ -1,8 +1,18 @@
 #include <iostream>
+#include <cstdlib>
 #include "adder.h"
 
-int main()
+int main(int argc, char* argv[])
 {
-    std::cout << add(2, 3) << std::endl;
+    if (argc != 3)
+    {
+        std::cerr << "Usage: " << argv[0] << " <a> <b>\n";
+        return 1;
+    }
+
+    int a = std::atoi(argv[1]);
+    int b = std::atoi(argv[2]);
+
+    std::cout << add(a, b) << std::endl;
     return 0;
 }
