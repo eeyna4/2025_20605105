@@ -1,0 +1,8 @@
+C:/Users/LLR User/Documents/worksheet6/build/Desktop_Qt_6_10_2_MSVC2022_64bit-Debug/CMakeFiles/worksheet6.dir
+C:/Users/LLR User/Documents/worksheet6/build/Desktop_Qt_6_10_2_MSVC2022_64bit-Debug/CMakeFiles/edit_cache.dir
+C:/Users/LLR User/Documents/worksheet6/build/Desktop_Qt_6_10_2_MSVC2022_64bit-Debug/CMakeFiles/rebuild_cache.dir
+C:/Users/LLR User/Documents/worksheet6/build/Desktop_Qt_6_10_2_MSVC2022_64bit-Debug/CMakeFiles/list_install_components.dir
+C:/Users/LLR User/Documents/worksheet6/build/Desktop_Qt_6_10_2_MSVC2022_64bit-Debug/CMakeFiles/install.dir
+C:/Users/LLR User/Documents/worksheet6/build/Desktop_Qt_6_10_2_MSVC2022_64bit-Debug/CMakeFiles/install/local.dir
+C:/Users/LLR User/Documents/worksheet6/build/Desktop_Qt_6_10_2_MSVC2022_64bit-Debug/CMakeFiles/worksheet6_autogen_timestamp_deps.dir
+C:/Users/LLR User/Documents/worksheet6/build/Desktop_Qt_6_10_2_MSVC2022_64bit-Debug/CMakeFiles/worksheet6_autogen.dir
