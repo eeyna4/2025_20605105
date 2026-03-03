@@ -1,0 +1,1 @@
+Local VTK at C:\Program Files (x86)\VTK is not built with Qt (no QVTK*.h / no GUISupportQt). Build Exercise3 on lab/VR PCs with VTK+Qt.
