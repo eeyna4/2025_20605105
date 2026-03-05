@@ -12,14 +12,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
 
-# VTK (no GUISupportQt in your local VTK build)
-find_package(VTK REQUIRED COMPONENTS
-  CommonCore
-  FiltersSources
-  RenderingCore
-  RenderingOpenGL2
-  InteractionStyle
-)
+# VTK (Qt-enabled install)
+# Worksheet7 requirement: use VTK REQUIRED (no per-module list)
+find_package(VTK REQUIRED)
 
 set(PROJECT_SOURCES
         main.cpp
@@ -43,17 +38,11 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         icons.qrc
         optionaldialog.h optionaldialog.cpp optionaldialog.ui
     )
-# Define target properties for Android with Qt 6 as:
-#    set_property(TARGET worksheet6 APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
-#                 ${CMAKE_CURRENT_SOURCE_DIR}/android)
-# For more information, see https://doc.qt.io/qt-6/qt-add-executable.html#target-creation
 else()
     if(ANDROID)
         add_library(worksheet6 SHARED
             ${PROJECT_SOURCES}
         )
-# Define properties for Android with Qt 5 after find_package() calls as:
-#    set(ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/android")
     else()
         add_executable(worksheet6
             ${PROJECT_SOURCES}
@@ -63,32 +52,15 @@ endif()
 
 target_link_libraries(worksheet6 PRIVATE
   Qt${QT_VERSION_MAJOR}::Widgets
-  VTK::CommonCore
-  VTK::FiltersSources
-  VTK::RenderingCore
-  VTK::RenderingOpenGL2
-  VTK::InteractionStyle
+  ${VTK_LIBRARIES}
 )
 
-vtk_module_autoinit(
-  TARGETS worksheet6
-  MODULES
-    VTK::CommonCore
-    VTK::FiltersSources
-    VTK::RenderingCore
-    VTK::RenderingOpenGL2
-    VTK::InteractionStyle
-)
-
-# Make sure QVTKOpenGLNativeWidget.h can be found
-# (VTK_DIR is set by Qt Creator's CMake config; headers live in VTK install include folder)
+# Make sure QVTKOpenGLNativeWidget.h can be found (use the Qt-enabled VTK install)
 target_include_directories(worksheet6 PRIVATE
-  "C:/Program Files (x86)/VTK/include/vtk-9.6"
+  "C:/VTK_Install_Qt/include/vtk-9.6"
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
-# If you are developing for iOS or macOS you should consider setting an
-# explicit, fixed bundle identifier manually though.
 if(${QT_VERSION} VERSION_LESS 6.1.0)
   set(BUNDLE_ID_OPTION MACOSX_BUNDLE_GUI_IDENTIFIER com.example.worksheet6)
 endif()
@@ -99,6 +71,19 @@ set_target_properties(worksheet6 PROPERTIES
     MACOSX_BUNDLE TRUE
     WIN32_EXECUTABLE TRUE
 )
+
+# Copy across OpenVR bindings that map controllers
+# The program will expect to find these in the build dir when it runs
+add_custom_target(VRBindings)
+
+add_custom_command(TARGET VRBindings PRE_BUILD
+  COMMAND ${CMAKE_COMMAND} -E copy_directory
+          ${CMAKE_SOURCE_DIR}/vrbindings
+          ${CMAKE_BINARY_DIR}/vrbindings
+)
+
+# Ensure vrbindings get copied whenever worksheet6 is built
+add_dependencies(worksheet6 VRBindings)
 
 include(GNUInstallDirs)
 install(TARGETS worksheet6

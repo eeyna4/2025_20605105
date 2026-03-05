@@ -10,6 +10,18 @@
 #include <QFileDialog>
 #include <QFileInfo>
 
+// VTK (Qt embedded)
+#include <vtkGenericOpenGLRenderWindow.h>
+#include <vtkRenderer.h>
+#include <vtkCamera.h>
+
+#include <vtkCylinderSource.h>
+#include <vtkPolyDataMapper.h>
+#include <vtkActor.h>
+#include <vtkProperty.h>
+
+#include <vtkNew.h>
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -18,6 +30,34 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(this, &MainWindow::statusUpdateMessage,
             ui->statusbar, &QStatusBar::showMessage);
+
+    // ===== Worksheet7 Exercise3: render VTK cylinder in embedded widget =====
+    renderWindow = vtkSmartPointer<vtkGenericOpenGLRenderWindow>::New();
+    ui->widget->setRenderWindow(renderWindow);   // NOTE: ui file name is "widget"
+
+    renderer = vtkSmartPointer<vtkRenderer>::New();
+    renderWindow->AddRenderer(renderer);
+
+    vtkNew<vtkCylinderSource> cylinder;
+    cylinder->SetResolution(8);
+
+    vtkNew<vtkPolyDataMapper> cylinderMapper;
+    cylinderMapper->SetInputConnection(cylinder->GetOutputPort());
+
+    vtkNew<vtkActor> cylinderActor;
+    cylinderActor->SetMapper(cylinderMapper);
+    cylinderActor->GetProperty()->SetColor(1.0, 0.0, 0.35);
+    cylinderActor->RotateX(30.0);
+    cylinderActor->RotateY(-45.0);
+
+    renderer->AddActor(cylinderActor);
+
+    renderer->ResetCamera();
+    renderer->GetActiveCamera()->Azimuth(30);
+    renderer->GetActiveCamera()->Elevation(30);
+    renderer->ResetCameraClippingRange();
+renderWindow->Render();
+    // ======================================================================
 
     // Tree model
     this->partList = new ModelPartList("Parts List");
@@ -66,7 +106,7 @@ void MainWindow::handleTreeClicked()
     emit statusUpdateMessage(QString("The selected item is : ") + text, 0);
 }
 
-// Exercise 9: run dialog from Delete button (عشان يكون عندك طريق ثاني غير right-click)
+// Exercise 9: run dialog from Delete button
 void MainWindow::on_pushButton_released()
 {
     on_actionItem_Options_triggered();

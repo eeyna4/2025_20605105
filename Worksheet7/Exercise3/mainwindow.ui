@@ -16,7 +16,14 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
-     <widget class="QVTKOpenGLNativeWidget" name="widget" native="true"/>
+     <widget class="QVTKOpenGLNativeWidget" name="widget" native="true">
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>200</height>
+       </size>
+      </property>
+     </widget>
     </item>
     <item>
      <widget class="QTreeView" name="treeView">
