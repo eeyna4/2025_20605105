@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QModelIndex>
 
 #include <vtkSmartPointer.h>
 class vtkRenderer;
@@ -31,6 +32,10 @@ private slots:
     void handleTreeClicked();
     void on_actionopen_File_triggered();
     void on_actionItem_Options_triggered();
+
+private:
+    void updateRender();
+    void updateRenderFromTree(const QModelIndex& index);
 
 private:
     Ui::MainWindow *ui;

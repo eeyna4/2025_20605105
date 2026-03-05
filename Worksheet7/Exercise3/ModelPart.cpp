@@ -9,22 +9,27 @@
 
 #include "ModelPart.h"
 
+// VTK
+#include <vtkProperty.h>
 
-/* Commented out for now, will be uncommented later when you have
- * installed the VTK library
- */
-//#include <vtkSmartPointer.h>
-//#include <vtkDataSetMapper.h>
-
-
-ModelPart::ModelPart(const QList<QVariant>& data, ModelPart* parent )
+ModelPart::ModelPart(const QList<QVariant>& data, ModelPart* parent)
     : m_itemData(data), m_parentItem(parent)
 {
-    /* Default values */
+    // Default values
     isVisible = true;
-    colourR = 0;
-    colourG = 0;
-    colourB = 0;
+
+    // IMPORTANT: default colour must not be black (or you won't see it on black background)
+    colourR = 255;
+    colourG = 255;
+    colourB = 255;
+
+    // Create empty actor/mapper so getActor() is always valid
+    mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+    actor  = vtkSmartPointer<vtkActor>::New();
+    actor->SetMapper(mapper);
+
+    actor->GetProperty()->SetColor(1.0, 1.0, 1.0);
+    actor->SetVisibility(1);
 }
 
 ModelPart::~ModelPart()
@@ -34,17 +39,12 @@ ModelPart::~ModelPart()
 
 void ModelPart::appendChild(ModelPart* item)
 {
-    /* Add another model part as a child of this part
-     * (it will appear as a sub-branch in the treeview)
-     */
     item->m_parentItem = this;
     m_childItems.append(item);
 }
 
 ModelPart* ModelPart::child(int row)
 {
-    /* Return pointer to child item in row below this item.
-     */
     if (row < 0 || row >= m_childItems.size())
         return nullptr;
     return m_childItems.at(row);
@@ -52,23 +52,16 @@ ModelPart* ModelPart::child(int row)
 
 int ModelPart::childCount() const
 {
-    /* Count number of child items
-     */
     return m_childItems.count();
 }
 
 int ModelPart::columnCount() const
 {
-    /* Count number of columns (properties) that this item has.
-     */
     return m_itemData.count();
 }
 
 QVariant ModelPart::data(int column) const
 {
-    /* Return the data associated with a column of this item
-     * QVariant is a generic placeholder type
-     */
     if (column < 0 || column >= m_itemData.size())
         return QVariant();
     return m_itemData.at(column);
@@ -76,8 +69,6 @@ QVariant ModelPart::data(int column) const
 
 void ModelPart::set(int column, const QVariant &value)
 {
-    /* Set the data associated with a column of this item
-     */
     if (column < 0 || column >= m_itemData.size())
         return;
 
@@ -91,40 +82,39 @@ ModelPart* ModelPart::parentItem()
 
 int ModelPart::row() const
 {
-    /* Return the row index of this item, relative to its parent.
-     */
     if (m_parentItem)
         return m_parentItem->m_childItems.indexOf(const_cast<ModelPart*>(this));
     return 0;
 }
 
-/* ---------- Colour handling (FIXED) ---------- */
+/* ---------- Colour handling ---------- */
 void ModelPart::setColour(const unsigned char R, const unsigned char G, const unsigned char B)
 {
     colourR = R;
     colourG = G;
     colourB = B;
+
+    if (actor) {
+        actor->GetProperty()->SetColor(
+            static_cast<double>(colourR) / 255.0,
+            static_cast<double>(colourG) / 255.0,
+            static_cast<double>(colourB) / 255.0
+        );
+    }
 }
 
-unsigned char ModelPart::getColourR()
-{
-    return colourR;
-}
+unsigned char ModelPart::getColourR() { return colourR; }
+unsigned char ModelPart::getColourG() { return colourG; }
+unsigned char ModelPart::getColourB() { return colourB; }
 
-unsigned char ModelPart::getColourG()
-{
-    return colourG;
-}
-
-unsigned char ModelPart::getColourB()
-{
-    return colourB;
-}
-
-/* ---------- Visibility handling (FIXED) ---------- */
+/* ---------- Visibility handling ---------- */
 void ModelPart::setVisible(bool isVisible)
 {
     this->isVisible = isVisible;
+
+    if (actor) {
+        actor->SetVisibility(isVisible ? 1 : 0);
+    }
 }
 
 bool ModelPart::visible()
@@ -132,14 +122,46 @@ bool ModelPart::visible()
     return this->isVisible;
 }
 
+/* ---------- STL loading (Worksheet7 Exercise4) ---------- */
 void ModelPart::loadSTL(QString fileName)
 {
-    Q_UNUSED(fileName);
-    /* Placeholder for later VTK work */
+    file = vtkSmartPointer<vtkSTLReader>::New();
+    file->SetFileName(fileName.toStdString().c_str());
+    file->Update();
+
+    mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+    mapper->SetInputConnection(file->GetOutputPort());
+
+    actor = vtkSmartPointer<vtkActor>::New();
+    actor->SetMapper(mapper);
+
+    // Apply current colour + visibility
+    actor->GetProperty()->SetColor(
+        static_cast<double>(colourR) / 255.0,
+        static_cast<double>(colourG) / 255.0,
+        static_cast<double>(colourB) / 255.0
+    );
+    actor->SetVisibility(isVisible ? 1 : 0);
 }
 
-//vtkSmartPointer<vtkActor> ModelPart::getActor() {
-//}
+vtkSmartPointer<vtkActor> ModelPart::getActor()
+{
+    return actor;
+}
 
-//vtkActor* ModelPart::getNewActor() {
-//}
+vtkActor* ModelPart::getNewActor()
+{
+    vtkActor* newActor = vtkActor::New();
+    if (mapper) {
+        newActor->SetMapper(mapper);
+    }
+
+    newActor->GetProperty()->SetColor(
+        static_cast<double>(colourR) / 255.0,
+        static_cast<double>(colourG) / 255.0,
+        static_cast<double>(colourB) / 255.0
+    );
+    newActor->SetVisibility(isVisible ? 1 : 0);
+
+    return newActor; // caller must Delete()
+}

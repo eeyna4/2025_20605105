@@ -10,15 +10,13 @@
 #include <QFileDialog>
 #include <QFileInfo>
 
+#include <QDialog>
+
 // VTK (Qt embedded)
 #include <vtkGenericOpenGLRenderWindow.h>
 #include <vtkRenderer.h>
 #include <vtkCamera.h>
-
-#include <vtkCylinderSource.h>
-#include <vtkPolyDataMapper.h>
-#include <vtkActor.h>
-#include <vtkProperty.h>
+#include <vtkMapper.h>
 
 #include <vtkNew.h>
 
@@ -31,33 +29,14 @@ MainWindow::MainWindow(QWidget *parent)
     connect(this, &MainWindow::statusUpdateMessage,
             ui->statusbar, &QStatusBar::showMessage);
 
-    // ===== Worksheet7 Exercise3: render VTK cylinder in embedded widget =====
+    // ===== VTK render window inside QVTKOpenGLNativeWidget =====
     renderWindow = vtkSmartPointer<vtkGenericOpenGLRenderWindow>::New();
-    ui->widget->setRenderWindow(renderWindow);   // NOTE: ui file name is "widget"
+    ui->widget->setRenderWindow(renderWindow);
 
     renderer = vtkSmartPointer<vtkRenderer>::New();
+    renderer->SetBackground(0.2, 0.2, 0.2); // avoid black-on-black
     renderWindow->AddRenderer(renderer);
-
-    vtkNew<vtkCylinderSource> cylinder;
-    cylinder->SetResolution(8);
-
-    vtkNew<vtkPolyDataMapper> cylinderMapper;
-    cylinderMapper->SetInputConnection(cylinder->GetOutputPort());
-
-    vtkNew<vtkActor> cylinderActor;
-    cylinderActor->SetMapper(cylinderMapper);
-    cylinderActor->GetProperty()->SetColor(1.0, 0.0, 0.35);
-    cylinderActor->RotateX(30.0);
-    cylinderActor->RotateY(-45.0);
-
-    renderer->AddActor(cylinderActor);
-
-    renderer->ResetCamera();
-    renderer->GetActiveCamera()->Azimuth(30);
-    renderer->GetActiveCamera()->Elevation(30);
-    renderer->ResetCameraClippingRange();
-renderWindow->Render();
-    // ======================================================================
+    // =========================================================
 
     // Tree model
     this->partList = new ModelPartList("Parts List");
@@ -67,7 +46,7 @@ renderWindow->Render();
     ui->treeView->setContextMenuPolicy(Qt::ActionsContextMenu);
     ui->treeView->addAction(ui->actionItem_Options);
 
-    // Build demo tree
+    // Build demo tree (optional)
     ModelPart* rootItem = this->partList->getRootItem();
 
     for (int i = 0; i < 3; i++) {
@@ -89,6 +68,8 @@ renderWindow->Render();
     // Exercise 5: show clicked item in status bar
     connect(ui->treeView, &QTreeView::clicked,
             this, &MainWindow::handleTreeClicked);
+
+    updateRender();
 }
 
 MainWindow::~MainWindow()
@@ -104,6 +85,46 @@ void MainWindow::handleTreeClicked()
     ModelPart* selectedPart = static_cast<ModelPart*>(index.internalPointer());
     QString text = selectedPart->data(0).toString();
     emit statusUpdateMessage(QString("The selected item is : ") + text, 0);
+}
+
+void MainWindow::updateRender()
+{
+    renderer->RemoveAllViewProps();
+
+    // Render all top-level items (not just the first)
+    int topRows = partList->rowCount(QModelIndex());
+    for (int i = 0; i < topRows; i++) {
+        updateRenderFromTree(partList->index(i, 0, QModelIndex()));
+    }
+
+    renderer->ResetCamera();
+    renderer->GetActiveCamera()->Azimuth(30);
+    renderer->GetActiveCamera()->Elevation(30);
+    renderer->ResetCameraClippingRange();
+
+    renderWindow->Render();
+}
+
+void MainWindow::updateRenderFromTree(const QModelIndex& index)
+{
+    if (index.isValid()) {
+        ModelPart* part = static_cast<ModelPart*>(index.internalPointer());
+        if (part && part->visible()) {
+            auto a = part->getActor();
+            if (a && a->GetMapper()) {
+                renderer->AddActor(a);
+            }
+        }
+    }
+
+    if (!partList->hasChildren(index) || (index.flags() & Qt::ItemNeverHasChildren)) {
+        return;
+    }
+
+    int rows = partList->rowCount(index);
+    for (int i = 0; i < rows; i++) {
+        updateRenderFromTree(partList->index(i, 0, index));
+    }
 }
 
 // Exercise 9: run dialog from Delete button
@@ -134,10 +155,11 @@ void MainWindow::on_actionItem_Options_triggered()
     if (dialog.exec() == QDialog::Accepted) {
         dialog.applyToModelPart(selectedPart);
 
-        // refresh both columns
         QModelIndex c0 = index.sibling(index.row(), 0);
         QModelIndex c1 = index.sibling(index.row(), 1);
         emit partList->dataChanged(c0, c1);
+
+        updateRender();
 
         emit statusUpdateMessage("Dialog accepted", 0);
     } else {
@@ -145,7 +167,7 @@ void MainWindow::on_actionItem_Options_triggered()
     }
 }
 
-// Exercise 8: Open file dialog and update selected item name
+// Exercise 8 / Worksheet7 Exercise4: Open STL, add item to tree, load STL, render
 void MainWindow::on_actionopen_File_triggered()
 {
     QString fileName = QFileDialog::getOpenFileName(
@@ -162,17 +184,27 @@ void MainWindow::on_actionopen_File_triggered()
 
     emit statusUpdateMessage(QString("Selected file: ") + fileName, 0);
 
+    QString baseName = QFileInfo(fileName).fileName();
+    QString visible("true");
+
+    ModelPart* newPart = new ModelPart({baseName, visible});
+    newPart->loadSTL(fileName);
+
     QModelIndex index = ui->treeView->currentIndex();
-    if (!index.isValid()) {
-        emit statusUpdateMessage("Select an item in the tree first", 3000);
-        return;
+    if (index.isValid()) {
+        ModelPart* selectedPart = static_cast<ModelPart*>(index.internalPointer());
+        selectedPart->appendChild(newPart);
+
+        ui->treeView->expand(index);
+
+        QModelIndex c0 = index.sibling(index.row(), 0);
+        QModelIndex c1 = index.sibling(index.row(), 1);
+        emit partList->dataChanged(c0, c1);
+    } else {
+        ModelPart* rootItem = this->partList->getRootItem();
+        rootItem->appendChild(newPart);
+        emit partList->layoutChanged();
     }
 
-    QString baseName = QFileInfo(fileName).fileName();
-
-    ModelPart* selectedPart = static_cast<ModelPart*>(index.internalPointer());
-    selectedPart->set(0, baseName);
-
-    QModelIndex c0 = index.sibling(index.row(), 0);
-    emit partList->dataChanged(c0, c0);
+    updateRender();
 }
