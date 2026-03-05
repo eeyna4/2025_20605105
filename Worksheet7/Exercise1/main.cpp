@@ -1,52 +1,51 @@
-#include <iostream>
-
 #include <vtkActor.h>
+#include <vtkCamera.h>
+#include <vtkCylinderSource.h>
 #include <vtkNew.h>
 #include <vtkPolyDataMapper.h>
+#include <vtkProperty.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>
 #include <vtkRenderer.h>
-#include <vtkSphereSource.h>
 
-int main(int argc, char* argv[])
+int main(int, char*[])
 {
-    (void)argc;
-    (void)argv;
+    // Create cylinder geometry
+    vtkNew<vtkCylinderSource> cylinder;
+    cylinder->SetResolution(8);
 
-    std::cout << "[VTK] Program start" << std::endl;
-
-    vtkNew<vtkSphereSource> sphere;
-    sphere->SetRadius(0.5);
-    sphere->SetThetaResolution(32);
-    sphere->SetPhiResolution(32);
-
+    // Mapper
     vtkNew<vtkPolyDataMapper> mapper;
-    mapper->SetInputConnection(sphere->GetOutputPort());
+    mapper->SetInputConnection(cylinder->GetOutputPort());
 
+    // Actor
     vtkNew<vtkActor> actor;
     actor->SetMapper(mapper);
+    actor->GetProperty()->SetColor(1.0, 0.0, 0.35);
+    actor->RotateX(30.0);
+    actor->RotateY(-45.0);
 
+    // Renderer
     vtkNew<vtkRenderer> renderer;
     renderer->AddActor(actor);
-    renderer->SetBackground(0.1, 0.2, 0.3);
 
-    vtkNew<vtkRenderWindow> rw;
-    rw->AddRenderer(renderer);
-    rw->SetSize(900, 600);
-    rw->SetWindowName("Worksheet7 VTK Sphere");
+    // Render window
+    vtkNew<vtkRenderWindow> renderWindow;
+    renderWindow->AddRenderer(renderer);
 
-    vtkNew<vtkRenderWindowInteractor> iren;
-    iren->SetRenderWindow(rw);
+    // Interactor
+    vtkNew<vtkRenderWindowInteractor> interactor;
+    interactor->SetRenderWindow(renderWindow);
 
-    std::cout << "[VTK] Before Render()" << std::endl;
-    rw->Render();
+    // Camera
+    renderer->ResetCamera();
+    renderer->GetActiveCamera()->Azimuth(30);
+    renderer->GetActiveCamera()->Elevation(30);
+    renderer->ResetCameraClippingRange();
 
-    std::cout << "[VTK] Before Initialize()" << std::endl;
-    iren->Initialize();
+    // Start
+    renderWindow->Render();
+    interactor->Start();
 
-    std::cout << "[VTK] Before Start() (window should appear now)" << std::endl;
-    iren->Start();
-
-    std::cout << "[VTK] After Start() (printed after window closes)" << std::endl;
-    return 0;
+    return EXIT_SUCCESS;
 }
