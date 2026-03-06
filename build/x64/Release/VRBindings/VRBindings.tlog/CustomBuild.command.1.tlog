@@ -1,0 +1,20 @@
+^C:\USERS\LLR USER\2025_20605105\WORKSHEET7\EXERCISE3\BUILD\CMAKEFILES\BF6CED15A79CA3097806C5181D7252DB\VRBINDINGS.RULE
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -E copy_directory "C:/Users/LLR User/2025_20605105/Worksheet7/Exercise3/vrbindings" "C:/Users/LLR User/2025_20605105/Worksheet7/Exercise3/build/Release/vrbindings"
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\USERS\LLR USER\2025_20605105\WORKSHEET7\EXERCISE3\CMAKELISTS.TXT
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" "-SC:/Users/LLR User/2025_20605105/Worksheet7/Exercise3" "-BC:/Users/LLR User/2025_20605105/Worksheet7/Exercise3/build" --check-stamp-file "C:/Users/LLR User/2025_20605105/Worksheet7/Exercise3/build/CMakeFiles/generate.stamp"
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

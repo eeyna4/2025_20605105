@@ -1,0 +1,10 @@
+^C:\USERS\LLR USER\2025_20605105\WORKSHEET7\EXERCISE3\BUILD\CMAKEFILES\BF6CED15A79CA3097806C5181D7252DB\GENERATE.STAMP.RULE
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" "-SC:/Users/LLR User/2025_20605105/Worksheet7/Exercise3" "-BC:/Users/LLR User/2025_20605105/Worksheet7/Exercise3/build" --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file "C:/Users/LLR User/2025_20605105/Worksheet7/Exercise3/build/Exercise3.sln"
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

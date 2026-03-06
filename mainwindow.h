@@ -2,6 +2,12 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QModelIndex>
+
+#include <vtkSmartPointer.h>
+class vtkRenderer;
+class vtkGenericOpenGLRenderWindow;
+class vtkActor;
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -29,8 +35,16 @@ private slots:
     void on_actionItem_Options_triggered();
 
 private:
+    void updateRender();
+    void updateRenderFromTree(const QModelIndex& index);
+
+private:
     Ui::MainWindow *ui;
     ModelPartList* partList;
+
+    vtkSmartPointer<vtkRenderer> renderer;
+    vtkSmartPointer<vtkGenericOpenGLRenderWindow> renderWindow;
+    vtkSmartPointer<vtkActor> cylinderActor;
 };
 
 #endif // MAINWINDOW_H

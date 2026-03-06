@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\LLR User\2025_20605105\Worksheet7\Exercise3\build\CMakeFiles\bf6ced15a79ca3097806c5181d7252db\VRBindings.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\LLR User\2025_20605105\Worksheet7\Exercise3\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="C:\Users\LLR User\2025_20605105\Worksheet7\Exercise3\build\CMakeFiles\VRBindings" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{1CB9201E-B1A2-3C27-9184-A702FF6ED624}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

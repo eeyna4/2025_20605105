@@ -1,0 +1,111 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\LLR User\2025_20605105\Worksheet7\Exercise3\build\Exercise3_autogen\mocs_compilation_Debug.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\LLR User\2025_20605105\Worksheet7\Exercise3\main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\LLR User\2025_20605105\Worksheet7\Exercise3\mainwindow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\LLR User\2025_20605105\Worksheet7\Exercise3\ModelPart.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\LLR User\2025_20605105\Worksheet7\Exercise3\ModelPartList.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\LLR User\2025_20605105\Worksheet7\Exercise3\optionaldialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\LLR User\2025_20605105\Worksheet7\Exercise3\build\Exercise3_autogen\EWIEGA46WW_Debug\qrc_icons.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\LLR User\2025_20605105\Worksheet7\Exercise3\build\Exercise3_autogen\mocs_compilation_Release.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\LLR User\2025_20605105\Worksheet7\Exercise3\build\Exercise3_autogen\EWIEGA46WW_Release\qrc_icons.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\LLR User\2025_20605105\Worksheet7\Exercise3\build\Exercise3_autogen\mocs_compilation_MinSizeRel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\LLR User\2025_20605105\Worksheet7\Exercise3\build\Exercise3_autogen\EWIEGA46WW_MinSizeRel\qrc_icons.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\LLR User\2025_20605105\Worksheet7\Exercise3\build\Exercise3_autogen\mocs_compilation_RelWithDebInfo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\LLR User\2025_20605105\Worksheet7\Exercise3\build\Exercise3_autogen\EWIEGA46WW_RelWithDebInfo\qrc_icons.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="C:\Users\LLR User\2025_20605105\Worksheet7\Exercise3\mainwindow.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\LLR User\2025_20605105\Worksheet7\Exercise3\ModelPart.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\LLR User\2025_20605105\Worksheet7\Exercise3\ModelPartList.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\LLR User\2025_20605105\Worksheet7\Exercise3\optionaldialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\LLR User\2025_20605105\Worksheet7\Exercise3\build\Exercise3_autogen\include_Debug\ui_mainwindow.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\LLR User\2025_20605105\Worksheet7\Exercise3\build\Exercise3_autogen\include_Debug\ui_optionaldialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\LLR User\2025_20605105\Worksheet7\Exercise3\build\Exercise3_autogen\include_Release\ui_mainwindow.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\LLR User\2025_20605105\Worksheet7\Exercise3\build\Exercise3_autogen\include_Release\ui_optionaldialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\LLR User\2025_20605105\Worksheet7\Exercise3\build\Exercise3_autogen\include_MinSizeRel\ui_mainwindow.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\LLR User\2025_20605105\Worksheet7\Exercise3\build\Exercise3_autogen\include_MinSizeRel\ui_optionaldialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\LLR User\2025_20605105\Worksheet7\Exercise3\build\Exercise3_autogen\include_RelWithDebInfo\ui_mainwindow.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\LLR User\2025_20605105\Worksheet7\Exercise3\build\Exercise3_autogen\include_RelWithDebInfo\ui_optionaldialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\LLR User\2025_20605105\Worksheet7\Exercise3\build\CMakeFiles\05e74aec0cff1189747c7719463f2fef\autouic_(CONFIG).stamp.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\LLR User\2025_20605105\Worksheet7\Exercise3\build\CMakeFiles\283f1fa7a1db8423747de2cbd1edbe45\qrc_icons.cpp.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\LLR User\2025_20605105\Worksheet7\Exercise3\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="C:\Users\LLR User\2025_20605105\Worksheet7\Exercise3\mainwindow.ui" />
+    <None Include="C:\Users\LLR User\2025_20605105\Worksheet7\Exercise3\optionaldialog.ui" />
+    <None Include="C:\Users\LLR User\2025_20605105\Worksheet7\Exercise3\icons.qrc" />
+    <None Include="C:\Users\LLR User\2025_20605105\Worksheet7\Exercise3\build\Exercise3_autogen\autouic_Debug.stamp" />
+    <None Include="C:\Users\LLR User\2025_20605105\Worksheet7\Exercise3\build\Exercise3_autogen\autouic_Release.stamp" />
+    <None Include="C:\Users\LLR User\2025_20605105\Worksheet7\Exercise3\build\Exercise3_autogen\autouic_MinSizeRel.stamp" />
+    <None Include="C:\Users\LLR User\2025_20605105\Worksheet7\Exercise3\build\Exercise3_autogen\autouic_RelWithDebInfo.stamp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{1CB9201E-B1A2-3C27-9184-A702FF6ED624}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{A493DB5F-A936-342F-B4C6-FF78FCD8E7B1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{09ADC6D8-80EE-3AB4-BD81-0710073B598E}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
