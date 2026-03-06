@@ -1,4 +1,1 @@
-﻿
-# ignore build output
-build/
-
+/build/

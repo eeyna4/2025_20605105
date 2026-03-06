@@ -7,7 +7,6 @@
 #include <vtkSmartPointer.h>
 class vtkRenderer;
 class vtkGenericOpenGLRenderWindow;
-class vtkActor;
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -44,7 +43,6 @@ private:
 
     vtkSmartPointer<vtkRenderer> renderer;
     vtkSmartPointer<vtkGenericOpenGLRenderWindow> renderWindow;
-    vtkSmartPointer<vtkActor> cylinderActor;
 };
 
 #endif // MAINWINDOW_H

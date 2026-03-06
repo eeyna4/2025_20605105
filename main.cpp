@@ -1,20 +1,17 @@
-// main.cpp
+#include "mainwindow.h"
 
 #include <QApplication>
 #include <QSurfaceFormat>
-#include <QVTKOpenGLNativeWidget.h>
 
-#include "mainwindow.h"
+#include <QVTKOpenGLNativeWidget.h>
 
 int main(int argc, char *argv[])
 {
-    // REQUIRED: ensures the widget gets the correct OpenGL format
+    // Required for QVTKOpenGLNativeWidget + VTK OpenGL
     QSurfaceFormat::setDefaultFormat(QVTKOpenGLNativeWidget::defaultFormat());
 
-    QApplication app(argc, argv);
-
+    QApplication a(argc, argv);
     MainWindow w;
     w.show();
-
-    return app.exec();
+    return a.exec();
 }
