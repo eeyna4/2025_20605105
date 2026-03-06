@@ -9,89 +9,156 @@
 #include <QTreeView>
 #include <QFileDialog>
 #include <QFileInfo>
-
 #include <QDialog>
+#include <QMenuBar>
+#include <QAction>
+#include <QSplitter>
+#include <QLabel>
+#include <QTimer>
 
-// VTK (Qt embedded)
+#include <QOpenGLContext>
+#include <QSurfaceFormat>
+
+#include <QVTKRenderWidget.h>
+
 #include <vtkGenericOpenGLRenderWindow.h>
 #include <vtkRenderer.h>
 #include <vtkCamera.h>
-#include <vtkMapper.h>
 
-#include <vtkNew.h>
+#include <QFile>
+#include <QTextStream>
+#include <QDateTime>
+
+static void mwlog(const char* msg)
+{
+    QFile f("C:/Users/LLR User/2025_20605105/Worksheet7/Exercise4/build/mwlog.txt");
+    if (!f.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text)) return;
+    QTextStream ts(&f);
+    ts << QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss.zzz") << " " << msg << "\n";
+    ts.flush();
+}
+
+static QTreeView* runtimeTree(MainWindow* self)
+{
+    return self->findChild<QTreeView*>("treeView_runtime");
+}
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
-    , ui(new Ui::MainWindow)
+    , ui(new Ui::MainWindow) // keep, do not call setupUi()
 {
-    ui->setupUi(this);
+    mwlog("STEP 1: constructor entered");
 
+    setStatusBar(new QStatusBar(this));
     connect(this, &MainWindow::statusUpdateMessage,
-            ui->statusbar, &QStatusBar::showMessage);
+            statusBar(), &QStatusBar::showMessage);
+    mwlog("STEP 2: statusbar ready");
 
-    // ===== VTK render window inside QVTKOpenGLNativeWidget =====
-    renderWindow = vtkSmartPointer<vtkGenericOpenGLRenderWindow>::New();
-    ui->widget->setRenderWindow(renderWindow);
+    auto *loading = new QLabel("Starting...", this);
+    loading->setWordWrap(true);
+    setCentralWidget(loading);
+    mwlog("STEP 3: setCentralWidget(loading)");
 
-    renderer = vtkSmartPointer<vtkRenderer>::New();
-    renderer->SetBackground(0.2, 0.2, 0.2); // avoid black-on-black
-    renderWindow->AddRenderer(renderer);
-    // =========================================================
+    auto *fileMenu = menuBar()->addMenu(tr("&File"));
+    auto *openAction = new QAction(tr("&Open File"), this);
+    fileMenu->addAction(openAction);
+    connect(openAction, &QAction::triggered,
+            this, &MainWindow::on_actionopen_File_triggered);
+    mwlog("STEP 4: menu open wired");
 
-    // Tree model
-    this->partList = new ModelPartList("Parts List");
-    ui->treeView->setModel(this->partList);
+    partList = new ModelPartList("Parts List");
+    mwlog("STEP 5: partList created");
 
-    // Exercise 10: context menu on tree
-    ui->treeView->setContextMenuPolicy(Qt::ActionsContextMenu);
-    ui->treeView->addAction(ui->actionItem_Options);
+    QTimer::singleShot(0, this, [this] {
+        mwlog("STEP 6: singleShot entered");
 
-    // Build demo tree (optional)
-    ModelPart* rootItem = this->partList->getRootItem();
+        auto *splitter = new QSplitter(this);
+        mwlog("STEP 7: splitter created");
 
-    for (int i = 0; i < 3; i++) {
-        QString name = QString("TopLevel %1").arg(i);
-        QString visible("true");
+        auto *treeView = new QTreeView(splitter);
+        treeView->setObjectName("treeView_runtime");
+        mwlog("STEP 8: treeView created");
 
-        ModelPart* childItem = new ModelPart({name, visible});
-        rootItem->appendChild(childItem);
+        // HARD CHECK: prove OpenGL context can be created BEFORE any QVTK widget.
+        mwlog("STEP 8.1: creating QOpenGLContext...");
+        QOpenGLContext ctx;
+        ctx.setFormat(QSurfaceFormat::defaultFormat());
+        if (!ctx.create()) {
+            mwlog("STEP 8.2: QOpenGLContext create FAILED");
 
-        for (int j = 0; j < 5; j++) {
-            QString name = QString("Item %1,%2").arg(i).arg(j);
-            QString visible("true");
-
-            ModelPart* childChildItem = new ModelPart({name, visible});
-            childItem->appendChild(childChildItem);
+            auto *err = new QLabel(
+                "OpenGL context creation failed.\n"
+                "This machine/driver cannot create the OpenGL context required for the VTK widget.\n\n"
+                "Try updating GPU drivers, or run with:\n"
+                "  set QT_OPENGL=angle\n"
+                "  set QT_ANGLE_PLATFORM=d3d11\n"
+                "or install a VTK build that provides QVTKOpenGLWidget.\n",
+                this
+            );
+            err->setWordWrap(true);
+            setCentralWidget(err);
+            return;
         }
-    }
+        mwlog("STEP 8.2: QOpenGLContext create OK");
 
-    // Exercise 5: show clicked item in status bar
-    connect(ui->treeView, &QTreeView::clicked,
-            this, &MainWindow::handleTreeClicked);
+        mwlog("STEP 8.5: BEFORE creating QVTKRenderWidget");
 
-    updateRender();
+        // If the process dies here, it is 100% inside the widget ctor.
+        auto *vtkWidget = new QVTKRenderWidget(splitter);
+        vtkWidget->setObjectName("vtkWidget_runtime");
+        mwlog("STEP 9: QVTKRenderWidget created");
+
+        splitter->addWidget(treeView);
+        splitter->addWidget(vtkWidget);
+        splitter->setStretchFactor(0, 0);
+        splitter->setStretchFactor(1, 1);
+        mwlog("STEP 10: splitter populated");
+
+        setCentralWidget(splitter);
+        mwlog("STEP 11: setCentralWidget(splitter)");
+
+        treeView->setModel(partList);
+        mwlog("STEP 12: treeView model set");
+
+        connect(treeView, &QTreeView::clicked, this, [this, treeView] {
+            QModelIndex index = treeView->currentIndex();
+            if (!index.isValid()) return;
+            ModelPart* selectedPart = static_cast<ModelPart*>(index.internalPointer());
+            emit statusUpdateMessage(QString("The selected item is : ") + selectedPart->data(0).toString(), 0);
+        });
+        mwlog("STEP 13: tree click wired");
+
+        renderWindow = vtkSmartPointer<vtkGenericOpenGLRenderWindow>::New();
+        vtkWidget->setRenderWindow(renderWindow);
+        mwlog("STEP 14: renderWindow set");
+
+        renderer = vtkSmartPointer<vtkRenderer>::New();
+        renderer->SetBackground(0.2, 0.2, 0.2);
+        renderWindow->AddRenderer(renderer);
+        mwlog("STEP 15: renderer added");
+
+        renderWindow->Render();
+        mwlog("STEP 16: initial render done");
+    });
 }
 
 MainWindow::~MainWindow()
 {
+    mwlog("STEP X: destructor");
     delete ui;
 }
 
 void MainWindow::handleTreeClicked()
 {
-    QModelIndex index = ui->treeView->currentIndex();
-    if (!index.isValid()) return;
-
-    ModelPart* selectedPart = static_cast<ModelPart*>(index.internalPointer());
-    QString text = selectedPart->data(0).toString();
-    emit statusUpdateMessage(QString("The selected item is : ") + text, 0);
+    // setupUi disabled; ignore
 }
 
 void MainWindow::updateRender()
 {
+    if (!renderer || !renderWindow || !partList) return;
+
     renderer->RemoveAllViewProps();
 
-    // Render all top-level items (not just the first)
     int topRows = partList->rowCount(QModelIndex());
     for (int i = 0; i < topRows; i++) {
         updateRenderFromTree(partList->index(i, 0, QModelIndex()));
@@ -117,9 +184,7 @@ void MainWindow::updateRenderFromTree(const QModelIndex& index)
         }
     }
 
-    if (!partList->hasChildren(index) || (index.flags() & Qt::ItemNeverHasChildren)) {
-        return;
-    }
+    if (!partList->hasChildren(index) || (index.flags() & Qt::ItemNeverHasChildren)) return;
 
     int rows = partList->rowCount(index);
     for (int i = 0; i < rows; i++) {
@@ -127,58 +192,35 @@ void MainWindow::updateRenderFromTree(const QModelIndex& index)
     }
 }
 
-// Exercise 9: run dialog from Delete button
 void MainWindow::on_pushButton_released()
 {
-    on_actionItem_Options_triggered();
+    emit statusUpdateMessage("Buttons unavailable (setupUi disabled)", 2000);
 }
 
 void MainWindow::on_pushButton_2_released()
 {
-    emit statusUpdateMessage("Add button was clicked", 0);
+    emit statusUpdateMessage("Buttons unavailable (setupUi disabled)", 2000);
 }
 
-// Exercise 10: right click action -> dialog
 void MainWindow::on_actionItem_Options_triggered()
 {
-    QModelIndex index = ui->treeView->currentIndex();
-    if (!index.isValid()) {
-        emit statusUpdateMessage("Select an item in the tree first", 3000);
-        return;
-    }
-
-    ModelPart* selectedPart = static_cast<ModelPart*>(index.internalPointer());
-
-    OptionalDialog dialog(this);
-    dialog.setFromModelPart(selectedPart);
-
-    if (dialog.exec() == QDialog::Accepted) {
-        dialog.applyToModelPart(selectedPart);
-
-        QModelIndex c0 = index.sibling(index.row(), 0);
-        QModelIndex c1 = index.sibling(index.row(), 1);
-        emit partList->dataChanged(c0, c1);
-
-        updateRender();
-
-        emit statusUpdateMessage("Dialog accepted", 0);
-    } else {
-        emit statusUpdateMessage("Dialog rejected", 0);
-    }
+    emit statusUpdateMessage("Item options unavailable (setupUi disabled)", 2000);
 }
 
-// Exercise 8 / Worksheet7 Exercise4: Open STL, add item to tree, load STL, render
 void MainWindow::on_actionopen_File_triggered()
 {
+    mwlog("Open File triggered");
+
     QString fileName = QFileDialog::getOpenFileName(
         this,
         tr("Open File"),
         "C:\\",
         tr("STL Files (*.stl);;Text Files (*.txt)")
-        );
+    );
 
     if (fileName.isEmpty()) {
         emit statusUpdateMessage("No file selected", 2000);
+        mwlog("Open File: canceled");
         return;
     }
 
@@ -190,21 +232,20 @@ void MainWindow::on_actionopen_File_triggered()
     ModelPart* newPart = new ModelPart({baseName, visible});
     newPart->loadSTL(fileName);
 
-    QModelIndex index = ui->treeView->currentIndex();
+    QTreeView* tv = runtimeTree(this);
+    QModelIndex index = tv ? tv->currentIndex() : QModelIndex();
+
     if (index.isValid()) {
         ModelPart* selectedPart = static_cast<ModelPart*>(index.internalPointer());
         selectedPart->appendChild(newPart);
-
-        ui->treeView->expand(index);
-
-        QModelIndex c0 = index.sibling(index.row(), 0);
-        QModelIndex c1 = index.sibling(index.row(), 1);
-        emit partList->dataChanged(c0, c1);
+        if (tv) tv->expand(index);
+        emit partList->dataChanged(index, index);
     } else {
-        ModelPart* rootItem = this->partList->getRootItem();
+        ModelPart* rootItem = partList->getRootItem();
         rootItem->appendChild(newPart);
         emit partList->layoutChanged();
     }
 
     updateRender();
+    mwlog("Open File: loaded + rendered");
 }
